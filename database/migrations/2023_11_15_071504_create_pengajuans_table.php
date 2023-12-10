@@ -25,6 +25,7 @@ return new class extends Migration
             $table->enum('bentuk',["kegiatan","event_lomba","finalis","student_exchange"]);
             $table->string('no_rek');
             $table->enum('status',['diproses','revisi','ditolak']);
+            $table->string('catatan')->nullable();
             
             $table->foreignId('mahasiswa_id');
             $table->timestamps();

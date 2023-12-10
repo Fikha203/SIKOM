@@ -18,9 +18,7 @@
     <div class="row d-flex justify-content-center">
         {{-- col-12 col-sm-7 pt-3 --}}
         <div class="col-12 col-sm-9 px-5">
-            <div class="text-end me-3 pt-3 me-sm-5 d-sm-block d-none">
-                <a href="/" class="text-secondary">Kembali</a>
-            </div>
+
             <h1 class="w-100 fw-bold text-center mt-5 mt-sm-0 mb-0 p-0 pt-sm-5 fs-3">MASUK</h1>
 
             {{-- @if (session()->has('error'))
@@ -35,7 +33,7 @@
                     <form action="/login" method="post" class="">
                         @csrf
                         <div class="mb-4">
-                            <label for="email" class="form-label">Email/NIM</label>
+                            <label for="email" class="form-label">Email</label>
                             <input type="text" class="form-control p-2 mt-1 @error('email') is-invalid @enderror"
                                 id="email" name="email" value="{{ old('email') }}" />
                             @error('email')
@@ -46,11 +44,12 @@
                         </div>
                         <div class="mb-5">
                             <label for="password" class="form-label">Password</label>
-                            <div class="d-flex flex-row-reverse align-items-center" id="wrapper">
+                            <div class="d-flex flex-row-reverse align-items-center">
                                 <input type="password" class="form-control p-2 mt-1 @error('password') is-invalid @enderror"
-                                    id="password" name="password" />
-                                <button type="button" class="btn bg-transparent show-password" id="show-btn"
-                                    data-bs-toggle="tooltip" data-bs-title="Tampilkan / Sembunyikan password">
+                                    id="password" name="password" aria-describedby="show-btn" />
+                                <button type="button" class="btn bg-transparent position-absolute start-auto"
+                                    id="show-btn" data-bs-toggle="tooltip"
+                                    data-bs-title="Tampilkan / Sembunyikan password">
                                     <i class="bi bi-eye-slash-fill"></i>
                                 </button>
                             </div>
@@ -80,3 +79,6 @@
         </div>
     </div>
 @endsection
+@section('scripts')
+    @vite('resources/js/display-password/login.js')
+@endsection()

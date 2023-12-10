@@ -15,10 +15,7 @@ use App\Http\Controllers\DashboardPengajuanController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
+Route::redirect('/', '/login');
 Route::get("/login", [AuthController::class, "index"])->name("login")->middleware("guest");
 Route::post("/login", [AuthController::class, "authenticate"])->middleware("guest");
 Route::get("/register", [AuthController::class, "indexRegister"])->middleware("guest");
@@ -28,9 +25,11 @@ Route::get("/logout", [AuthController::class, "logout"])->middleware("auth");
 Route::group(["middleware" => 'auth', "prefix" => "dashboard"], function () {
     // Dashboard
     Route::get("/", [DashboardPengajuanController::class, 'create']);
+    
+    Route::get('/pengajuans/download/{filepath}', [DashboardPengajuanController::class, 'download'])->where('filepath', '.*');;
 
     Route::resource('/pengajuans', DashboardPengajuanController::class);
-
+    
     // // Sluggable check
     // Route::get("/complaints/checkSlug", [DashboardComplaintController::class, "checkSlug"])->middleware("student");
     // Route::get("/categories/checkSlug", [DashboardAdminCategoryController::class, "checkSlug"])->middleware("admin");

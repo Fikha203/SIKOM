@@ -12,6 +12,8 @@ class Pengajuan extends Model
         'id',
     ];
 
+
+
     public function mahasiswa(){
         return $this->belongsTo(Mahasiswa::class);
     }
@@ -21,6 +23,10 @@ class Pengajuan extends Model
     }
     public function Proposal(){
         return $this->hasOne(Proposal::class);
+    }
+
+    public function berkas(){
+        return $this->hasMany(Berkas::class);
     }
     
 

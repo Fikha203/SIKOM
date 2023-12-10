@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pengajuan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class DashboardPengajuanController extends Controller
 {
@@ -13,15 +14,22 @@ class DashboardPengajuanController extends Controller
      */
     public function index()
     {
-        //
-        $pengajuans = Pengajuan::with(["mahasiswa", "lpj"])->where('mahasiswa_id',auth()->user()->id)->orderByDesc('created_at')->get();
+
         if(auth()->user()->level === "mahasiswa")
         {
+            $pengajuans = Pengajuan::with(["mahasiswa", "lpj"])->where('mahasiswa_id',auth()->user()->id)->orderByDesc('updated_at')->get();
+            
             return view("dashboard.index",[
                 "titile" => "Pengajuan",
                 "pengajuans" => $pengajuans,
             ]);
         }
+        $pengajuans = Pengajuan::with(["mahasiswa", "lpj"])->orderByDesc('updated_at')->get();
+
+        return view("dashboard.index",[
+            "titile" => "Pengajuan",
+            "pengajuans" => $pengajuans,
+        ]);
         
     }
 
@@ -68,26 +76,25 @@ class DashboardPengajuanController extends Controller
         try {
             $pengajuan = Pengajuan::create($credentials);
             $pengajuan->lpj()->create($credentials_lpj);
-            // Jika ada gambar yang diunggah, simpan gambar-gambar tersebut
-            if ($request->hasFile("upload_kendali")) {
-                $path1 = $request->file("upload_kendali")->store('pengajuan-doc');
-                $path2 = $request->file("upload_acc_keuangan")->store('pengajuan-doc');
-                $path3 = $request->file("upload_lpj")->store('pengajuan-doc');
-                $path4 = $request->file("upload_sertifikat_lomba")->store('pengajuan-doc');
+
+                // Get File
+                $file1 = $request->file("upload_kendali");
+                $file2 = $request->file("upload_acc_keuangan");
+                $file3 = $request->file("upload_lpj");
+                $file4 = $request->file("upload_sertifikat_lomba");
+
+                $path1 = $file1 ? $file1->storeAs('lpj-doc', str_replace(' ', '-', $file1->getClientOriginalName())) : null;
+                $path2 = $file2 ? $file2->storeAs('lpj-doc', str_replace(' ', '-', $file2->getClientOriginalName())) : null;
+                $path3 = $file3 ? $file3->storeAs('lpj-doc', str_replace(' ', '-', $file3->getClientOriginalName())) : null;
+                $path4 = $file4 ? $file4->storeAs('lpj-doc', str_replace(' ', '-', $file4->getClientOriginalName())) : null;
+            
+              
                 $pengajuan->lpj()->update([
                     "upload_kendali" => $path1,
                     "upload_acc_keuangan" => $path2,
                     "upload_lpj" => $path3,
                     "upload_sertifikat_lomba" => $path4,
                 ]);
-                // foreach ($request->file("images") as $image) {
-                //     $path = $image->store('complaint-images');
-                //     // Simpan path gambar ke dalam tabel images
-                //     $complaint->images()->create([
-                //         "image_path" => $path,
-                //     ]);
-                // }
-            }
     
             return redirect('/dashboard')->with('success', 'Pengajuan kamu berhasil dibuat!');
         } catch (\Exception $e) {
@@ -116,7 +123,83 @@ class DashboardPengajuanController extends Controller
      */
     public function update(Request $request, Pengajuan $pengajuan)
     {
-        //
+        if(auth()->user()->level == "mahasiswa")
+        {
+            
+
+            // dd($request);
+            $credentials = $request->validate([
+                "tipe"=>["required"],
+            ]);
+    
+            $credentials_lpj = $request->validate([
+                "upload_kendali"=>["file"],
+                "upload_acc_keuangan"=>["file"],
+                "upload_lpj"=>["file"],
+                "upload_sertifikat_lomba"=>["file"],
+            ]);
+    
+            $credentials["mahasiswa_id"] = auth()->user()->mahasiswa->id;
+            try {
+                $pengajuan->update(['tipe' => $credentials["tipe"]]);
+                $file1 = $request->file("upload_kendali");
+                $file2 = $request->file("upload_acc_keuangan");
+                $file3 = $request->file("upload_lpj");
+                $file4 = $request->file("upload_sertifikat_lomba");
+
+                collect([
+                    'upload_kendali',
+                    'upload_acc_keuangan',
+                    'upload_lpj',
+                    'upload_sertifikat_lomba',
+                ])->each(function ($field) use ($pengajuan) {
+                    if ($pengajuan->lpj->$field) {
+                        Storage::delete($pengajuan->lpj->$field);
+                    }
+                });
+            
+                // Check if files exist in the request
+                $path1 = $file1 ? $file1->storeAs('lpj-doc', str_replace(' ', '-', $file1->getClientOriginalName())) : null;
+                $path2 = $file2 ? $file2->storeAs('lpj-doc', str_replace(' ', '-', $file2->getClientOriginalName())) : null;
+                $path3 = $file3 ? $file3->storeAs('lpj-doc', str_replace(' ', '-', $file3->getClientOriginalName())) : null;
+                $path4 = $file4 ? $file4->storeAs('lpj-doc', str_replace(' ', '-', $file4->getClientOriginalName())) : null;
+
+
+                // if($pengajuan->lpj->upload)
+
+                // Update the lpj relationship
+                $pengajuan->lpj()->update([
+                    "upload_kendali" => $path1,
+                    "upload_acc_keuangan" => $path2,
+                    "upload_lpj" => $path3,
+                    "upload_sertifikat_lomba" => $path4,
+                ]);
+                $pengajuan->update([
+                    "status" => "diproses"
+                ]);
+                $pengajuan->touch();
+        
+                return back()->with('success', 'Pengajuan barhasil di update!');
+            } catch (\Exception $e) {
+                return back()->withErrors('Pengajuan gagal di edit' . $e->getMessage());
+            }
+        }
+        $credentials = $request->validate([
+            "status"=>["required"],
+            "catatan"=>[""],
+        ]);
+
+        try{
+            $pengajuan->update([
+                "status"=> $credentials["status"],
+                "catatan"=> $credentials["catatan"] ? $credentials["catatan"] : null,
+            ]);
+            return back()->with('success', 'Pengajuan barhasil di update!');
+        } catch (\Exception $e) {
+            return back()->withErrors('Pengajuan gagal di edit' . $e->getMessage());
+        }
+
+
     }
 
     /**
@@ -125,5 +208,11 @@ class DashboardPengajuanController extends Controller
     public function destroy(Pengajuan $pengajuan)
     {
         //
+    }
+
+    public function download($filepath)
+    {
+        // dd($filepath);
+        return Storage::download($filepath);
     }
 }

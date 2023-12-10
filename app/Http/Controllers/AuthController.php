@@ -16,7 +16,7 @@ class AuthController extends Controller
     public function authenticate(Request $request)
     {
         $credentials = $request->validate([
-            "email" => ["required"],
+            "email" => ["required", "email:rfc,dns"],
             "password" => ["required"],
         ]);
 
@@ -36,7 +36,7 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect("/")->with("toast_success", "Logout berhasil!");
+        return redirect("/login")->with("toast_success", "Logout berhasil!");
     }
 
     public function indexRegister()

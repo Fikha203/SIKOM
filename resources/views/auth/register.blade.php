@@ -25,9 +25,6 @@
         </div> --}}
 
         <div class="col-12 col-sm-7 pt-3">
-            <div class="text-end me-3 pt-3 me-sm-5 d-sm-block d-none">
-                <a href="/" class="text-secondary">Kembali</a>
-            </div>
             <h1 class="w-100 fw-bold text-center mt-5 mt-sm-0 mb-0 p-0 pt-sm-5 fs-3">Daftar</h1>
 
             {{-- @if (session()->has('error'))
