@@ -141,7 +141,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5">
+                                        <td colspan="7">
                                             <p class="text-center mt-3">Tidak ada laporan :(</p>
                                         </td>
                                     </tr>
@@ -264,7 +264,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5">
+                                        <td colspan="7">
                                             <p class="text-center mt-3">Tidak ada laporan :(</p>
                                         </td>
                                     </tr>

@@ -19,7 +19,7 @@
                         </div>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="topbarUserDropdown">
-                        <li><a class="dropdown-item" href="#">My Account</a></li>
+                        <li><a class="dropdown-item" href="/users/{{ auth()->user()->id }}">My Account</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
@@ -49,14 +49,14 @@
                 </li>
 
 
-                @can('staff')
+                {{-- @can('staff')
                     <li class="menu-item {{ Request::is('dashboard/user*') ? 'active' : '' }}">
                         <a href="#" class='menu-link'>
                             <span><i class="bi bi-file-earmark-medical-fill"></i>Users</span>
                         </a>
 
                     </li>
-                @endcan
+                @endcan --}}
 
 
 

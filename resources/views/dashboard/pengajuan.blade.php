@@ -339,8 +339,7 @@
                                                                                 <div class="position-relative">
                                                                                     <select class="form-select" id="bentuk"
                                                                                         name="bentuk">
-                                                                                        <option value="kegiatan">Kegiatan
-                                                                                        </option>
+
                                                                                         <option value="event_lomba">EVENT LOMBA
                                                                                             (Mengadakan Event)
                                                                                         </option>
